@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"next",
+				"next_state"
+			],
+			[
+				"ME",
+				"MEMORY_BUFFER"
+			],
+			[
+				"appro",
+				"approximation"
+			],
+			[
 				"path",
 				"path_file"
 			],
@@ -22,10 +34,6 @@
 			[
 				"Dep",
 				"DeepQLearning"
-			],
-			[
-				"appro",
-				"approximation_function"
 			],
 			[
 				"episode",
@@ -115,7 +123,16 @@
 			"file": "train.py",
 			"settings":
 			{
-				"buffer_size": 1679,
+				"buffer_size": 3878,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "ddql.py",
+			"settings":
+			{
+				"buffer_size": 3908,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -165,6 +182,7 @@
 	],
 	"file_history":
 	[
+		"/home/anhtu293/Documents/RL/flappybird/README.md",
 		"/home/anhtu293/Documents/computer_vision/vgg.py",
 		"/home/anhtu293/Documents/vn_celeb_face_recognition/README.md",
 		"/home/anhtu293/Documents/vn_celeb_face_recognition/data_generator.py",
@@ -243,7 +261,7 @@
 	],
 	"find":
 	{
-		"height": 39.0
+		"height": 26.0
 	},
 	"find_in_files":
 	{
@@ -257,6 +275,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"K_w",
+			"reset",
+			"reset\n\n\n",
+			"\t\t\n",
 			"reward",
 			"actions",
 			"K_w",
@@ -286,7 +308,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -302,8 +324,8 @@
 						"selection":
 						[
 							[
-								11138,
-								11138
+								5787,
+								5787
 							]
 						],
 						"settings":
@@ -313,10 +335,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4828.0,
+						"translation.y": 2791.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -332,8 +354,8 @@
 						"selection":
 						[
 							[
-								999,
-								999
+								7923,
+								7923
 							]
 						],
 						"settings":
@@ -343,10 +365,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2397.0,
+						"translation.y": 4338.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -355,15 +377,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1679,
+						"buffer_size": 3878,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1642,
-								1642
+								3878,
+								3878
 							]
 						],
 						"settings":
@@ -372,7 +394,36 @@
 							"syntax": "Packages/Python/Python.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 255.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "ddql.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3908,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1835,
+								1835
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -462,7 +513,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 217.0,
+	"side_bar_width": 211.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

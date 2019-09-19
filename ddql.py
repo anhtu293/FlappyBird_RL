@@ -11,7 +11,8 @@ import itertools
 import random
 import time
 
-MEMORY_BUFFER = []
+MEMORY_BUFFER_SELECTION = []
+MEMORY_BUFFER_EVALUATION = []
 MEMORY_BUFFER_SIZE = 10000
 NUMBER_EPISODES = 100000
 BATCH_SIZE = 32
@@ -63,7 +64,11 @@ def DeepQLearning(epsilon = 1, discount = 0.99):
 	env = PLE(game, fps = 30, display_screen = True, reward_values = rewards)
 	env.init()
 
-	model = build_model(env)
+	model_selection = build_model(env)
+	model_evaluation = bulid_model(env)
+
+	MEMORY_BUFFERS = [MEMORY_BUFFER_EVALUATION, MEMORY_BUFFER_SELECTION]
+	models = [model_evaluation, model_selection]
 
 	#parameters
 	actions = env.getActionSet()
@@ -105,12 +110,14 @@ def DeepQLearning(epsilon = 1, discount = 0.99):
 
 			if len(MEMORY_BUFFER) == MEMORY_BUFFER_SIZE:
 				MEMORY_BUFFER.pop(0)
-			MEMORY_BUFFER.append((state, action_index, reward, next_state, done))
+
+			model_choice = np.random.choice(np.array([0,1]))
+			MEMORY_BUFFERS[model_choice].append((state, action_index, reward, next_state, done))
 
 			if env.game_over():
 				break
 		env.reset_game()
-		experience_replay(env, model, discount)
+		experience_replay(env, models[model_choice], discount)
 		#print(action_reward)
 		if i % 100 == 0:
 			print("\nEpisode {}/{} ---- Score : {}".format(i,NUMBER_EPISODES, score))
@@ -131,7 +138,7 @@ def experience_replay(env, model, discount):
 
 	batch_Q_to_update = np.asarray(batch_Q_to_update).reshape(BATCH_SIZE, len(env.getActionSet()))
 	updateModel(model, batch_states, batch_Q_to_update)
-	
+
 	"""
 	batch_rewards += np.invert(batch_done).astype(np.float32)*discount*np.amax(approximation(model, batch_nextstates), axis = 1)
 	batch_Q_to_update = approximation(model, batch_nextstates)
