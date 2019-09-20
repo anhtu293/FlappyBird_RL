@@ -7,13 +7,17 @@ from skimage.color import rgb2gray
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Input
 from tensorflow.keras import optimizers
 from tensorflow.keras.models import Model
+from tensorflow.keras.models import load_model
 import itertools
 import random
 import time
+import getopt
+import sys
+import pickle
 
 MEMORY_BUFFER = []
 MEMORY_BUFFER_SIZE = 10000
-NUMBER_EPISODES = 100000
+NUMBER_EPISODES = 10000
 BATCH_SIZE = 32
 
 def nth_root(num, n):
@@ -51,19 +55,24 @@ def epsilon_greedy_policy(model, state, nA, epsilon):
 def updateModel(model, state, updatedQ):
 	return model.fit(state, updatedQ, batch_size = BATCH_SIZE, verbose = 0)
 
-def DeepQLearning(epsilon = 1, discount = 0.99):
+def DeepQLearning(mode, fname = '', epsilon = 1, discount = 0.99):
 	game = FlappyBird()
 
 	rewards = {
-		'positive' : 1,
+		'positive' : 10,
 		'stick' : 0,
-		'loss' : 0	
+		'loss' : -10	
 	}
 
-	env = PLE(game, fps = 30, display_screen = True, reward_values = rewards)
+	env = PLE(game, fps = 30, display_screen = False, reward_values = rewards)
 	env.init()
 
-	model = build_model(env)
+	if mode == 'new':
+		model = build_model(env)
+	elif mode == 'retrain':
+		model = load_model(fname)
+		with open("MEMORY_BUFFER.txt", "rb") as fp:
+			MEMORY_BUFFER = pickle.load(fp)
 
 	#parameters
 	actions = env.getActionSet()
@@ -74,13 +83,14 @@ def DeepQLearning(epsilon = 1, discount = 0.99):
 
 	print("=========== Start Training ===========\n")
 
+	avg_score = []
+
 	for i in range(1, NUMBER_EPISODES):
 		epsilon = epsilon*epsilon_decay
 		score = 0
-		avg_score = []
 		#cdaction_reward = []
 		if (i % 1000 == 0):
-			avg = np.mean(np.asarray(avg_score))
+			avg = np.mean(np.array(avg_score))
 			model.save_weights('episode_{}_AvgScore_{}.hdf5'.format(i, avg))
 			avg_score.clear()
 			print("\nEpisode_{}_AvgScore_{}.hdf5 Saved !".format(i, avg))
@@ -97,8 +107,6 @@ def DeepQLearning(epsilon = 1, discount = 0.99):
 			score += reward
 			done = env.game_over()
 
-			avg_score.append(score)
-
 			#action_reward.append((action, reward))
 			if not env.game_over():
 				reward += discount*np.max(approximation(model, next_state))
@@ -110,10 +118,14 @@ def DeepQLearning(epsilon = 1, discount = 0.99):
 			if env.game_over():
 				break
 		env.reset_game()
+		avg_score.append(score)
 		experience_replay(env, model, discount)
 		#print(action_reward)
 		if i % 100 == 0:
 			print("\nEpisode {}/{} ---- Score : {}".format(i,NUMBER_EPISODES, score))
+
+	with open("MEMORY_BUFFER.txt", "wb") as fp:
+		pickle.dump(MEMORY_BUFFER, fb)
 
 	return model
 		
@@ -138,5 +150,16 @@ def experience_replay(env, model, discount):
 	"""
 
 if __name__ == '__main__':
-	model = DeepQLearning()
-	model.save_model('FlappyBird.h5')
+	optlist, args = getopt.getopt(sys.argv[1:], "m:i:o:")
+	for opt, arg in optlist:
+		if opt == "-m":
+			mode = arg
+		elif opt == "-i":
+			input_name = arg
+		elif opt == "-o":
+			output_name = arg
+	if mode == 'new':
+		model = DeepQLearning(mode = mode)
+	elif mode == 'retrain':
+		model = DeepQLearning(mode = mode, fname = input_file)
+	model.save(output_name)
