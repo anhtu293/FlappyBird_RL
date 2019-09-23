@@ -17,7 +17,7 @@ import pickle
 
 MEMORY_BUFFER = []
 MEMORY_BUFFER_SIZE = 10000
-NUMBER_EPISODES = 10000
+NUMBER_EPISODES = 50000
 BATCH_SIZE = 32
 
 def nth_root(num, n):
@@ -76,6 +76,7 @@ def DeepQLearning(mode, fname = '', epsilon = 1, discount = 0.99):
 	actions = env.getActionSet()
 	print(actions)
 	nA = len(env.getActionSet())
+
 	final_epsilon = 0.1
 	epsilon_decay = nth_root(NUMBER_EPISODES, final_epsilon/epsilon)
 
