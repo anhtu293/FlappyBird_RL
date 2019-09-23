@@ -27,7 +27,7 @@ def build_model(env):
 	#dim action space
 	nA = len(env.getActionSet())
 	
-	input_shape = (64, 64, 1)
+	input_shape = (80, 80, 1)
 	input_nn = Input(shape = input_shape)
 	conv3_1 = Conv2D(16, kernel_size = 3,strides = 1, padding = 'same', activation = 'relu')(input_nn)
 	conv3_2 = Conv2D(32, kernel_size = 3, strides = 1, padding = 'same', activation = 'relu')(conv3_1)
@@ -37,12 +37,12 @@ def build_model(env):
 
 	model = Model(inputs = input_nn, outputs= fc2)
 
-	optimizer = optimizers.Adam(0.0001)
+	optimizer = optimizers.Adam(0.001)
 	model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mse'])
 	return model
 
 def approximation(model, state):
-	state = state.reshape((-1,64,64,1))
+	state = state.reshape((-1,80,80,1))
 	return model.predict(state, verbose = 0)
 
 def epsilon_greedy_policy(model, state, nA, epsilon):
@@ -71,61 +71,60 @@ def DeepQLearning(mode, fname = '', epsilon = 1, discount = 0.99):
 		model = build_model(env)
 	elif mode == 'retrain':
 		model = load_model(fname)
-		with open("MEMORY_BUFFER.txt", "rb") as fp:
-			MEMORY_BUFFER = pickle.load(fp)
 
 	#parameters
 	actions = env.getActionSet()
 	print(actions)
 	nA = len(env.getActionSet())
-	final_epsilon = 0.001
+	final_epsilon = 0.1
 	epsilon_decay = nth_root(NUMBER_EPISODES, final_epsilon/epsilon)
 
 	print("=========== Start Training ===========\n")
 
 	avg_score = []
-
+	score = 0
 	for i in range(1, NUMBER_EPISODES):
 		epsilon = epsilon*epsilon_decay
-		score = 0
-		#cdaction_reward = []
-		if (i % 1000 == 0):
-			avg = np.mean(np.array(avg_score))
-			model.save_weights('episode_{}_AvgScore_{}.hdf5'.format(i, avg))
+		action_reward = []
+		if (i % 10000 == 0):
+			avg = mean(avg_score)
+			model.save('episode_{}_AvgScore_{}.h5'.format(i, avg))
 			avg_score.clear()
 			print("\nEpisode_{}_AvgScore_{}.hdf5 Saved !".format(i, avg))
 
 		for t in itertools.count():
-			#appro next action
-			state = img_as_float(resize(env.getScreenGrayscale(), (64,64)))
-			state = state.reshape((64, 64, 1))
+			#approx next action
+			state = img_as_float(resize(env.getScreenGrayscale(), (80,80)))
+			state = state.reshape((80, 80, 1))
 			action_index = epsilon_greedy_policy(model, state, nA, epsilon)
 			action = actions[action_index]
 			reward = env.act(action)
-			next_state = img_as_float(resize(env.getScreenGrayscale(), (64,64)))
-			next_state = next_state.reshape((64, 64, 1))
+			next_state = img_as_float(resize(env.getScreenGrayscale(), (80,80)))
+			next_state = next_state.reshape((80, 80, 1))
 			score += reward
 			done = env.game_over()
 
 			#action_reward.append((action, reward))
-			if not env.game_over():
-				reward += discount*np.max(approximation(model, next_state))
 
 			if len(MEMORY_BUFFER) == MEMORY_BUFFER_SIZE:
 				MEMORY_BUFFER.pop(0)
 			MEMORY_BUFFER.append((state, action_index, reward, next_state, done))
 
+			experience_replay(env, model, discount)
+
 			if env.game_over():
 				break
+		
 		env.reset_game()
 		avg_score.append(score)
-		experience_replay(env, model, discount)
+		
 		#print(action_reward)
-		if i % 100 == 0:
-			print("\nEpisode {}/{} ---- Score : {}".format(i,NUMBER_EPISODES, score))
+		
+		print("\nEpisode {}/{} ---- Score : {}".format(i,NUMBER_EPISODES, score))
+		score = 0
 
 	with open("MEMORY_BUFFER.txt", "wb") as fp:
-		pickle.dump(MEMORY_BUFFER, fb)
+		pickle.dump(MEMORY_BUFFER, fp)
 
 	return model
 		
@@ -161,5 +160,7 @@ if __name__ == '__main__':
 	if mode == 'new':
 		model = DeepQLearning(mode = mode)
 	elif mode == 'retrain':
-		model = DeepQLearning(mode = mode, fname = input_file)
+		with open("MEMORY_BUFFER.txt", "rb") as fp:
+			MEMORY_BUFFER = pickle.load(fp)
+		model = DeepQLearning(mode = mode, fname = input_name)
 	model.save(output_name)
