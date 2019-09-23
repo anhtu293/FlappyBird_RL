@@ -127,7 +127,7 @@ def DeepQLearning(mode, fname = '', epsilon = 1, discount = 0.99):
 		score = 0
 
 	with open("MEMORY_BUFFER.txt", "wb") as fp:
-		pickle.dump(MEMORY_BUFFER, fp)
+		pickle.dump("/content/drive/My Drive/"+MEMORY_BUFFER, fp)
 
 	return model
 		
@@ -165,7 +165,7 @@ if __name__ == '__main__':
 	if mode == 'new':
 		model = DeepQLearning(mode = mode)
 	elif mode == 'retrain':
-		with open("MEMORY_BUFFER.txt", "rb") as fp:
+		with open("/content/drive/My Drive/"+"MEMORY_BUFFER.txt", "rb") as fp:
 			MEMORY_BUFFER = pickle.load(fp)
 		model = DeepQLearning(mode = mode, fname = input_name)
 	model.save("/content/drive/My Drive/"+output_name)
