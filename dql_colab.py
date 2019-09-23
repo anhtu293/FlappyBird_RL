@@ -14,6 +14,7 @@ import time
 import getopt
 import sys
 import pickle
+from google.colab import drive
 
 
 MEMORY_BUFFER = []
@@ -90,7 +91,7 @@ def DeepQLearning(mode, fname = '', epsilon = 1, discount = 0.99):
 		action_reward = []
 		if (i % 10000 == 0):
 			avg = mean(avg_score)
-			model.save('episode_{}_AvgScore_{}.h5'.format(i, avg))
+			model.save("/content/drive/My Drive/"+'episode_{}_AvgScore_{}.h5'.format(i, avg))
 			avg_score.clear()
 			print("\nEpisode_{}_AvgScore_{}.hdf5 Saved !".format(i, avg))
 
@@ -151,6 +152,7 @@ def experience_replay(env, model, discount):
 	"""
 
 if __name__ == '__main__':
+	drive.mount('/content/drive')
 
 	optlist, args = getopt.getopt(sys.argv[1:], "m:i:o:")
 	for opt, arg in optlist:
@@ -166,4 +168,4 @@ if __name__ == '__main__':
 		with open("MEMORY_BUFFER.txt", "rb") as fp:
 			MEMORY_BUFFER = pickle.load(fp)
 		model = DeepQLearning(mode = mode, fname = input_name)
-	model.save(output_name)
+	model.save("/content/drive/My Drive/"+output_name)
